@@ -250,7 +250,7 @@ async function fetchAndDisplayItems() {
             loadingIndicator.classList.add('hidden');
             table.classList.remove('hidden');
         }
-        lastUpdatedText.textContent = `Final update：${new Date().toLocaleString()}`;
+        lastUpdatedText.textContent = `Final update: ${new Date().toLocaleString()}`;
 
     } catch (error) {
         console.error('Error fetching data:', error);
