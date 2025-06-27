@@ -1,0 +1,207 @@
+/* 基本樣式 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 表格樣式 */
+#item-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#item-table th, #item-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+#item-table th {
+    background-color: #3498db;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#item-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#item-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 特殊狀態樣式 */
+#item-table tr.unavailable td:nth-child(2) {
+    color: #95a5a6; /* 灰色文字 */
+    font-style: italic;
+}
+
+/* Control Icon in Header */
+.control-icon {
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 0.9em;
+    color: #ffffff; /* Inherit from th */
+    transition: transform 0.2s ease-in-out;
+}
+
+.control-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Popover Styles */
+.popover {
+    position: absolute; /* Will be positioned relative to the container or body */
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 300px;
+    padding: 15px;
+    box-sizing: border-box;
+    top: 100px; /* Placeholder, will adjust with JS */
+    left: 50%; /* Placeholder, will adjust with JS */
+    transform: translateX(-50%); /* Center horizontally */
+}
+
+.popover.hidden {
+    display: none;
+}
+
+.popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.popover-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.popover .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+}
+
+.popover .close-button:hover {
+    color: #333;
+}
+
+.popover-content h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.filter-group, .sort-group {
+    margin-bottom: 10px;
+}
+
+.filter-group label, .sort-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-group input[type="text"],
+.filter-group input[type="number"],
+.sort-group select {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.filter-group input[type="number"] {
+    width: calc(50% - 15px); /* For min/max price */
+    display: inline-block;
+}
+.filter-group span {
+    display: inline-block;
+    width: 10px;
+    text-align: center;
+}
+
+.sort-group input[type="radio"] {
+    margin-right: 5px;
+}
+
+.popover button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+}
+
+.popover button:hover {
+    background-color: #2980b9;
+}
+
+#reset-filters-sort {
+    background-color: #95a5a6;
+}
+
+#reset-filters-sort:hover {
+    background-color: #7f8c8d;
+}
+
+/* 更新動畫樣式 */
+@keyframes highlight-fade {
+    from { background-color: #d4edda; } /* 淡綠色 */
+    to { background-color: transparent; }
+}
+
+.row-updated {
+    animation: highlight-fade 2s ease-out;
+}
+
+/* 載入與錯誤提示 */
+#loading-indicator, #error-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1em;
+    color: #7f8c8d;
+}
+
+.hidden {
+    display: none;
+}
+.status-bar {
+    text-align: right;
+    color: #555;
+    margin-bottom: 15px;
+    height: 1em; /* 避免內容變動時頁面跳動 */
+}

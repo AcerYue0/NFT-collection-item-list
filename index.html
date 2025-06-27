@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道具價格查詢</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>道具市場價格列表</h1>
+        <div class="status-bar">
+            <small id="last-updated-text"></small>
+        </div>
+        
+        <div id="loading-indicator">
+            <p>正在從伺服器載入資料...</p>
+        </div>
+
+        <div id="error-message" class="hidden">
+            <p>資料載入失敗，請稍後再試。</p>
+        </div>
+
+        <table id="item-table" class="hidden">
+            <thead>
+                <tr>
+                    <th>道具名稱 <span class="control-icon" id="filter-sort-toggle">⚙️</span></th>
+                    <th>市場價格</th>
+                    <th>最後更新時間 (UTC)</th>
+                </tr>
+            </thead>
+            <tbody id="item-table-body">
+                <!-- JavaScript 會在這裡動態插入資料 -->
+            </tbody>
+        </table>
+
+        <!-- Floating Window (Popover) for Filter/Sort -->
+        <div id="filter-sort-popover" class="popover hidden">
+            <div class="popover-header">
+                <h3>篩選與排序</h3>
+                <button id="close-popover" class="close-button">&times;</button>
+            </div>
+            <div class="popover-content">
+                <h4>篩選</h4>
+                <div class="filter-group">
+                    <label for="item-name-filter">道具名稱:</label>
+                    <input type="text" id="item-name-filter" placeholder="輸入道具名稱...">
+                </div>
+                <div class="filter-group">
+                    <label for="price-min-filter">價格範圍:</label>
+                    <input type="number" id="price-min-filter" placeholder="最低價格">
+                    <span>-</span>
+                    <input type="number" id="price-max-filter" placeholder="最高價格">
+                </div>
+
+                <h4>排序</h4>
+                <div class="sort-group">
+                    <label>排序依據:</label>
+                    <select id="sort-by">
+                        <option value="itemName">道具名稱</option>
+                        <option value="price">市場價格</option>
+                        <option value="updateTimeUTC">更新時間</option>
+                    </select>
+                </div>
+                <div class="sort-group">
+                    <label>排序方向:</label>
+                    <input type="radio" id="sort-asc" name="sort-order" value="asc" checked>
+                    <label for="sort-asc">升序</label>
+                    <input type="radio" id="sort-desc" name="sort-order" value="desc">
+                    <label for="sort-desc">降序</label>
+                </div>
+                <button id="apply-filters-sort">應用</button>
+                <button id="reset-filters-sort">重置</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
