@@ -71,7 +71,7 @@ function renderTable(processedData) {
         // 注意：這裡的 oldDetails 仍然是從 masterData 中獲取，用於比較原始數據的變動
         // 而不是 processedData 中的變動，因為動畫是基於原始數據的實際更新
         const oldDetails = masterData[itemName];
-        const priceText = itemDetails.price === -1 ? '市場上無此道具' : itemDetails.price.toLocaleString();
+        const priceText = itemDetails.price === -1 ? 'N/A' : itemDetails.price.toLocaleString();
         const formattedTime = formatTime(itemDetails.updateTimeUTC);
 
         const rowContent = `
@@ -216,7 +216,7 @@ function applySort(data, sort) {
 async function fetchAndDisplayItems() {
     const isFirstLoad = Object.keys(masterData).length === 0;
 
-    lastUpdatedText.textContent = '正在更新...';
+    lastUpdatedText.textContent = 'Update in progress...';
     
     // 只有在第一次載入時才顯示全頁的 loading indicator
     if (isFirstLoad) {
@@ -234,8 +234,8 @@ async function fetchAndDisplayItems() {
 
         // 檢查是否有資料
         if (isFirstLoad && Object.keys(newData).length === 0) {
-            loadingIndicator.innerText = '找不到任何道具資料。';
-            lastUpdatedText.textContent = '無資料';
+            loadingIndicator.innerText = 'No data available.';
+            lastUpdatedText.textContent = 'No data';
             return;
         }
 
@@ -250,15 +250,15 @@ async function fetchAndDisplayItems() {
             loadingIndicator.classList.add('hidden');
             table.classList.remove('hidden');
         }
-        lastUpdatedText.textContent = `最後更新：${new Date().toLocaleString()}`;
+        lastUpdatedText.textContent = `Final update：${new Date().toLocaleString()}`;
 
     } catch (error) {
-        console.error('抓取資料時發生錯誤:', error);
+        console.error('Error fetching data:', error);
         errorMessage.classList.remove('hidden');
         if (isFirstLoad) {
             loadingIndicator.classList.add('hidden');
         }
-        lastUpdatedText.textContent = '更新失敗！';
+        lastUpdatedText.textContent = 'Update failed.';
     }
 }
 

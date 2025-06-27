@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>道具價格查詢</title>
+    <title>NFT collection price list</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>道具市場價格列表</h1>
+        <h1>NFT collection price list</h1>
         <div class="status-bar">
             <small id="last-updated-text"></small>
         </div>
         
         <div id="loading-indicator">
-            <p>正在從伺服器載入資料...</p>
+            <p>Fetching data from server...</p>
         </div>
 
         <div id="error-message" class="hidden">
-            <p>資料載入失敗，請稍後再試。</p>
+            <p>Data fetch error. Please try again later.</p>
         </div>
 
         <table id="item-table" class="hidden">
             <thead>
                 <tr>
-                    <th>道具名稱 <span class="control-icon" id="filter-sort-toggle">⚙️</span></th>
-                    <th>市場價格</th>
-                    <th>最後更新時間 (UTC)</th>
+                    <th>Item name<span class="control-icon" id="filter-sort-toggle">⚙️</span></th>
+                    <th>Price</th>
+                    <th>Last update</th>
                 </tr>
             </thead>
             <tbody id="item-table-body">
@@ -38,40 +38,40 @@
         <!-- Floating Window (Popover) for Filter/Sort -->
         <div id="filter-sort-popover" class="popover hidden">
             <div class="popover-header">
-                <h3>篩選與排序</h3>
+                <h3>Filter & Sort</h3>
                 <button id="close-popover" class="close-button">&times;</button>
             </div>
             <div class="popover-content">
-                <h4>篩選</h4>
+                <h4>Filter</h4>
                 <div class="filter-group">
-                    <label for="item-name-filter">道具名稱:</label>
-                    <input type="text" id="item-name-filter" placeholder="輸入道具名稱...">
+                    <label for="item-name-filter">Item name:</label>
+                    <input type="text" id="item-name-filter" placeholder="Enter item name...">
                 </div>
                 <div class="filter-group">
-                    <label for="price-min-filter">價格範圍:</label>
-                    <input type="number" id="price-min-filter" placeholder="最低價格">
+                    <label for="price-min-filter">Price range:</label>
+                    <input type="number" id="price-min-filter" placeholder="Lowest price">
                     <span>-</span>
-                    <input type="number" id="price-max-filter" placeholder="最高價格">
+                    <input type="number" id="price-max-filter" placeholder="Highest price">
                 </div>
 
-                <h4>排序</h4>
+                <h4>Sort</h4>
                 <div class="sort-group">
-                    <label>排序依據:</label>
+                    <label>Sort by:</label>
                     <select id="sort-by">
-                        <option value="itemName">道具名稱</option>
-                        <option value="price">市場價格</option>
-                        <option value="updateTimeUTC">更新時間</option>
+                        <option value="itemName">Item name</option>
+                        <option value="price">Price</option>
+                        <option value="updateTimeUTC">update time</option>
                     </select>
                 </div>
                 <div class="sort-group">
-                    <label>排序方向:</label>
+                    <label>Order:</label>
                     <input type="radio" id="sort-asc" name="sort-order" value="asc" checked>
-                    <label for="sort-asc">升序</label>
+                    <label for="sort-asc">Asc</label>
                     <input type="radio" id="sort-desc" name="sort-order" value="desc">
-                    <label for="sort-desc">降序</label>
+                    <label for="sort-desc">Desc</label>
                 </div>
-                <button id="apply-filters-sort">應用</button>
-                <button id="reset-filters-sort">重置</button>
+                <button id="apply-filters-sort">Apply</button>
+                <button id="reset-filters-sort">Reset</button>
             </div>
         </div>
     </div>
