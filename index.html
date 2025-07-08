@@ -21,11 +21,12 @@
         <div id="error-message" class="hidden">
             <p>Data fetch error. Please try again later.</p>
         </div>
-
+        <span class="control-icon" id="filter-sort-toggle">Filter ⚙️</span>
         <table id="item-table" class="hidden">
             <thead>
                 <tr>
-                    <th>Item name<span class="control-icon" id="filter-sort-toggle">⚙️</span></th>
+                    <th>Image</th>
+                    <th>Item name</th>
                     <th>Price</th>
                     <th>Last update</th>
                 </tr>
@@ -75,7 +76,7 @@
             </div>
         </div>
     </div>
-
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

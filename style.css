@@ -57,7 +57,11 @@ h1 {
 
 /* Control Icon in Header */
 .control-icon {
+    background-color: #3498db;
+    font-weight: bold;
+    border-radius: 10px;
     cursor: pointer;
+    padding: 5px;
     margin-left: 8px;
     font-size: 0.9em;
     color: #ffffff; /* Inherit from th */
@@ -65,7 +69,7 @@ h1 {
 }
 
 .control-icon:hover {
-    transform: scale(1.1);
+    transform: scale(1.5);
 }
 
 /* Popover Styles */
