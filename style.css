@@ -209,3 +209,13 @@ h1 {
     margin-bottom: 15px;
     height: 1em; /* 避免內容變動時頁面跳動 */
 }
+
+.time-cell {
+    min-width: 165px; 
+    white-space: nowrap; 
+}
+
+.image-cell {
+    width: 50px; 
+    text-align: center;
+}

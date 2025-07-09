@@ -58,6 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 將所有功能性函式定義在這裡。因為它們都在 DOMContentLoaded 內部，
     // 所以它們可以存取上面定義的所有變數。
 
+    // 定義統一的時間格式選項，強制使用 24 小時制
+    const dateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+
     /**
      * 切換篩選/排序彈出視窗的顯示狀態
      */
@@ -69,11 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 將 UTC timestamp (秒) 轉換為本地時間的可讀字串
+     * 將 UTC timestamp (秒或毫秒) 轉換為本地時間的可讀字串。
+     * 會自動偵測 timestamp 的單位。
      */
-    function formatTime(utcSeconds) {
-        if (!utcSeconds || typeof utcSeconds !== 'number') return 'N/A';
-        return new Date(utcSeconds * 1000).toLocaleString();
+    function formatTime(utcTimestamp) {
+        if (!utcTimestamp || typeof utcTimestamp !== 'number') return 'N/A';
+
+        // 透過數值大小判斷 timestamp 是秒還是毫秒
+        // 當前時間的秒級 timestamp 約為 10 位數，毫秒級為 13 位數
+        const timestampInMs = utcTimestamp > 10**11 ? utcTimestamp : utcTimestamp * 1000;
+        return new Date(timestampInMs).toLocaleString('default', dateTimeFormatOptions);
     }
 
     /**
@@ -111,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. 圖片欄
             const imgCell = document.createElement('td');
+            imgCell.className = 'image-cell';
             imgCell.innerHTML = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
 
             // 2. 名稱欄
@@ -123,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 4. 更新時間欄
             const timeCell = document.createElement('td');
+            timeCell.className = 'time-cell';
             timeCell.textContent = formatTime(item.updateTimeUTC);
 
             // 5. 新增：持有狀態 checkbox 欄
@@ -150,9 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         itemsToDisplay = itemsToDisplay.filter(item => {
             const nameMatch = !currentFilters.itemName || item.itemName.toLowerCase().includes(currentFilters.itemName.toLowerCase());
-            const minPriceMatch = currentFilters.priceMin === null || item.price === -1 || item.price >= currentFilters.priceMin;
-            const maxPriceMatch = currentFilters.priceMax === null || item.price === -1 || item.price <= currentFilters.priceMax;
             
+            // 價格是否為 N/A (null, undefined, or -1)，統一處理
+            const isPriceNA = item.price == null || item.price === -1;
+            const minPriceMatch = currentFilters.priceMin === null || isPriceNA || item.price >= currentFilters.priceMin;
+            const maxPriceMatch = currentFilters.priceMax === null || isPriceNA || item.price <= currentFilters.priceMax;
             // 新的篩選邏輯：根據 collectedStatus 決定是否顯示
             const collectedStatus = currentFilters.collectedStatus;
             const isOwned = ownedItems.has(item.itemName);
@@ -171,8 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let valB = b[currentSort.by];
 
             if (currentSort.by === 'price') {
-                valA = valA === -1 ? Infinity : valA;
-                valB = valB === -1 ? Infinity : valB;
+                // 將無法購買的項目 (null, undefined, -1) 的價格視為無限大，
+                // 這樣在升序排列時它們會被排到最後面。
+                valA = (valA == null || valA === -1) ? Infinity : valA;
+                valB = (valB == null || valB === -1) ? Infinity : valB;
             }
 
             if (valA < valB) return currentSort.order === 'asc' ? -1 : 1;
@@ -298,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadingIndicator.classList.add('hidden');
                 table.classList.remove('hidden');
             }
-            lastUpdatedText.textContent = `Final update: ${new Date().toLocaleString()}`;
+            lastUpdatedText.textContent = `Final update: ${new Date().toLocaleString('default', dateTimeFormatOptions)}`;
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -335,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 重新渲染表格以顯示更新
             processAndRender();
-            lastUpdatedText.textContent = `Real-time update: ${new Date().toLocaleString()}`;
+            lastUpdatedText.textContent = `Real-time update: ${new Date().toLocaleString('default', dateTimeFormatOptions)}`;
 
         } catch (error) {
             console.error('Error processing MQTT message:', error);
