@@ -191,10 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let valB = b[currentSort.by];
 
             if (currentSort.by === 'price') {
-                // 將無法購買的項目 (null, undefined, -1) 的價格視為無限大，
-                // 這樣在升序排列時它們會被排到最後面。
-                valA = (valA == null || valA === -1) ? Infinity : valA;
-                valB = (valB == null || valB === -1) ? Infinity : valB;
+                const isAsc = currentSort.order === 'asc';
+                // N/A 項目永遠排在最後
+                const naValue = isAsc ? Infinity : -Infinity;
+                valA = (valA == null || valA === -1) ? naValue : valA;
+                valB = (valB == null || valB === -1) ? naValue : valB;
             }
 
             if (valA < valB) return currentSort.order === 'asc' ? -1 : 1;
