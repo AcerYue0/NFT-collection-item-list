@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
     const API_URL = 'https://marketplace-core-ll9s.onrender.com/api/marketplace/getList';
-    const UPDATE_INTERVAL_MS = 3 * 60 * 1000; // 30 分鐘
+    const UPDATE_INTERVAL_MS = 1 * 60 * 1000; // 30 分鐘
 
     // MQTT 設定 (請根據您的環境修改)
     const MQTT_BROKER_URL = 'ws://127.0.0.1:9001'; // 使用 WebSocket (ws:// 或 wss://)
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 標記無法購買的項目
-            if (item.price === -1) {
+            if (item.price == null || item.price === -1) {
                 row.classList.add('unavailable');
             }
 
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 3. 價格欄
             const priceCell = document.createElement('td');
-            priceCell.textContent = item.price === -1 ? 'N/A' : item.price.toLocaleString();
+            priceCell.textContent = (item.price == null || item.price === -1) ? 'N/A' : item.price.toLocaleString();
 
             // 4. 更新時間欄
             const timeCell = document.createElement('td');
