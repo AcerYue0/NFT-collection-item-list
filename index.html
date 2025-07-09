@@ -17,15 +17,15 @@
         <div id="loading-indicator">
             <p>Fetching data from server...</p>
         </div>
-
+        <span class="control-icon" id="filter-sort-toggle">Filter & Sort⚙️</span>
         <div id="error-message" class="hidden">
             <p>Data fetch error. Please try again later.</p>
         </div>
-
         <table id="item-table" class="hidden">
             <thead>
                 <tr>
-                    <th>Item name<span class="control-icon" id="filter-sort-toggle">⚙️</span></th>
+                    <th>Image</th>
+                    <th>Item name</th>
                     <th>Price</th>
                     <th>Last update</th>
                 </tr>
@@ -58,8 +58,8 @@
                 <div class="sort-group">
                     <label>Sort by:</label>
                     <select id="sort-by">
-                        <option value="itemName">Item name</option>
                         <option value="price">Price</option>
+                        <option value="itemName">Item name</option>
                         <option value="updateTimeUTC">update time</option>
                     </select>
                 </div>

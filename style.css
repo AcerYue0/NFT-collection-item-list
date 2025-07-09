@@ -57,9 +57,13 @@ h1 {
 
 /* Control Icon in Header */
 .control-icon {
+    background-color: #3498db;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
     cursor: pointer;
     margin-left: 8px;
-    font-size: 0.9em;
+    font-size: 1em;
     color: #ffffff; /* Inherit from th */
     transition: transform 0.2s ease-in-out;
 }
