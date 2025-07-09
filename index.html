@@ -28,6 +28,7 @@
                     <th>Item name</th>
                     <th>Price</th>
                     <th>Last update</th>
+                    <th>Collected</th>
                 </tr>
             </thead>
             <tbody id="item-table-body">
@@ -52,6 +53,15 @@
                     <input type="number" id="price-min-filter" placeholder="Lowest price">
                     <span>-</span>
                     <input type="number" id="price-max-filter" placeholder="Highest price">
+                </div>
+
+                <div class="filter-group">
+                    <label for="collected-status-filter">Collected status:</label>
+                    <select id="collected-status-filter">
+                        <option value="all">Show all</option>
+                        <option value="collected">Collected only</option>
+                        <option value="uncollected">Uncollected only</option>
+                    </select>
                 </div>
 
                 <h4>Sort</h4>

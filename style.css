@@ -125,11 +125,11 @@ h1 {
     color: #555;
 }
 
-.filter-group, .sort-group {
+.filter-group, .sort-group, .filter-group {
     margin-bottom: 10px;
 }
 
-.filter-group label, .sort-group label {
+.filter-group label, .sort-group label, .filter-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
@@ -137,7 +137,7 @@ h1 {
 
 .filter-group input[type="text"],
 .filter-group input[type="number"],
-.sort-group select {
+.sort-group select, .filter-group select {
     width: calc(100% - 10px);
     padding: 8px;
     border: 1px solid #ccc;

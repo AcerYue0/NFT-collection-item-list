@@ -1,12 +1,10 @@
-// d:\Code\web\NFT-collection-item-list\script.js
-
 // 確保整個網頁文件 (DOM) 都載入完成後，才開始執行我們的 JavaScript 程式碼。
 // 這是非常重要的最佳實踐，可以避免試圖操作還不存在的 HTML 元素。
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
-    const API_URL = '';
-    const UPDATE_INTERVAL_MS = 30 * 60 * 1000; // 30 分鐘
+    const API_URL = 'https://marketplace-core-ll9s.onrender.com/api/marketplace/getList';
+    const UPDATE_INTERVAL_MS = 3 * 60 * 1000; // 30 分鐘
 
     // MQTT 設定 (請根據您的環境修改)
     const MQTT_BROKER_URL = 'ws://127.0.0.1:9001'; // 使用 WebSocket (ws:// 或 wss://)
@@ -18,13 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let allApiData = [];
     // 儲存用於比較價格變動的舊資料快照
     let previousDataSnapshot = {};
+    // 儲存使用者標記為已持有的物品 (使用 Set 結構以獲得高效的查找性能)
+    let ownedItems = new Set(JSON.parse(localStorage.getItem('ownedItems') || '[]'));
 
     // 儲存當前的篩選條件
     let currentFilters = localStorage.getItem('currentFilters') ? JSON.parse(localStorage.getItem('currentFilters')) :
     {
         itemName: '',
         priceMin: null,
-        priceMax: null
+        priceMax: null,
+        collectedStatus: 'all' // 'all', 'collected', 'uncollected'
     };
     // 儲存當前的排序條件 (預設按更新時間降序)
     let currentSort = localStorage.getItem('currentSort') ? JSON.parse(localStorage.getItem('currentSort')) :
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceMinFilterInput = document.getElementById('price-min-filter');
     const priceMaxFilterInput = document.getElementById('price-max-filter');
     const sortBySelect = document.getElementById('sort-by');
+    const collectedStatusFilterSelect = document.getElementById('collected-status-filter');
     const applyFiltersSortButton = document.getElementById('apply-filters-sort');
     const resetFiltersSortButton = document.getElementById('reset-filters-sort');
 
@@ -83,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
 
         if (items.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4">No items match the criteria.</td></tr>';
+            // 注意：欄位數已從 4 變為 5
+            tableBody.innerHTML = '<tr><td colspan="5">No items match the criteria.</td></tr>';
             return;
         }
 
@@ -91,27 +94,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         items.forEach(item => {
             const row = document.createElement('tr');
-            const oldItem = previousDataSnapshot[item.itemName];
 
+            // 處理價格變動的視覺提示
+            const oldItem = previousDataSnapshot[item.itemName];
             if (oldItem && oldItem.price !== item.price) {
                 row.classList.add('row-updated');
                 row.addEventListener('animationend', () => row.classList.remove('row-updated'), { once: true });
             }
 
+            // 標記無法購買的項目
             if (item.price === -1) {
                 row.classList.add('unavailable');
             }
 
-            const imgUrl = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
-            const priceText = item.price === -1 ? 'N/A' : item.price.toLocaleString();
-            const formattedTime = formatTime(item.updateTimeUTC);
+            // --- 使用 createElement 重構，方便綁定事件 ---
 
-            row.innerHTML = `
-                <td>${imgUrl}</td>
-                <td>${item.itemName}</td>
-                <td>${priceText}</td>
-                <td>${formattedTime}</td>
-            `;
+            // 1. 圖片欄
+            const imgCell = document.createElement('td');
+            imgCell.innerHTML = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
+
+            // 2. 名稱欄
+            const nameCell = document.createElement('td');
+            nameCell.textContent = item.itemName;
+
+            // 3. 價格欄
+            const priceCell = document.createElement('td');
+            priceCell.textContent = item.price === -1 ? 'N/A' : item.price.toLocaleString();
+
+            // 4. 更新時間欄
+            const timeCell = document.createElement('td');
+            timeCell.textContent = formatTime(item.updateTimeUTC);
+
+            // 5. 新增：持有狀態 checkbox 欄
+            const ownedCell = document.createElement('td');
+            const ownedCheckbox = document.createElement('input');
+            ownedCheckbox.type = 'checkbox';
+            ownedCheckbox.className = 'owned-checkbox';
+            ownedCheckbox.dataset.itemName = item.itemName; // 將物品名稱存在 data-* 屬性中
+            ownedCheckbox.checked = ownedItems.has(item.itemName); // 根據 Set 決定是否勾選
+            ownedCheckbox.addEventListener('change', handleOwnedCheckboxChange); // 綁定事件
+            ownedCell.appendChild(ownedCheckbox);
+
+            row.append(imgCell, nameCell, priceCell, timeCell, ownedCell);
             fragment.appendChild(row);
         });
 
@@ -128,7 +152,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameMatch = !currentFilters.itemName || item.itemName.toLowerCase().includes(currentFilters.itemName.toLowerCase());
             const minPriceMatch = currentFilters.priceMin === null || item.price === -1 || item.price >= currentFilters.priceMin;
             const maxPriceMatch = currentFilters.priceMax === null || item.price === -1 || item.price <= currentFilters.priceMax;
-            return nameMatch && minPriceMatch && maxPriceMatch;
+            
+            // 新的篩選邏輯：根據 collectedStatus 決定是否顯示
+            const collectedStatus = currentFilters.collectedStatus;
+            const isOwned = ownedItems.has(item.itemName);
+            let collectedStatusMatch = true; // 預設為 true (對應 'all')
+            if (collectedStatus === 'collected') {
+                collectedStatusMatch = isOwned;
+            } else if (collectedStatus === 'uncollected') {
+                collectedStatusMatch = !isOwned;
+            }
+
+            return nameMatch && minPriceMatch && maxPriceMatch && collectedStatusMatch;
         });
 
         itemsToDisplay.sort((a, b) => {
@@ -149,12 +184,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * 處理「持有」checkbox 的點擊事件
+     * @param {Event} event
+     */
+    function handleOwnedCheckboxChange(event) {
+        const checkbox = event.target;
+        const itemName = checkbox.dataset.itemName;
+
+        if (checkbox.checked) {
+            ownedItems.add(itemName);
+        } else {
+            ownedItems.delete(itemName);
+        }
+
+        // 將更新後的 Set 轉為陣列並存入 localStorage
+        localStorage.setItem('ownedItems', JSON.stringify(Array.from(ownedItems)));
+
+        // 如果篩選器不是 "Show all"，則立即重新渲染以符合篩選條件
+        if (currentFilters.collectedStatus !== 'all') {
+            processAndRender();
+        }
+    }
+
+    /**
      * 處理篩選和排序的應用
      */
     function handleFilterSort() {
         currentFilters.itemName = itemNameFilterInput.value.trim();
         currentFilters.priceMin = priceMinFilterInput.value ? parseFloat(priceMinFilterInput.value) : null;
         currentFilters.priceMax = priceMaxFilterInput.value ? parseFloat(priceMaxFilterInput.value) : null;
+        currentFilters.collectedStatus = collectedStatusFilterSelect.value;
+
         currentSort.by = sortBySelect.value;
         currentSort.order = document.querySelector('input[name="sort-order"]:checked').value;
         localStorage.setItem('currentFilters', JSON.stringify(currentFilters));
@@ -172,13 +232,30 @@ document.addEventListener('DOMContentLoaded', () => {
         priceMinFilterInput.value = '';
         priceMaxFilterInput.value = '';
         sortBySelect.value = 'updateTimeUTC';
+        collectedStatusFilterSelect.value = 'all';
         document.querySelector('input[name="sort-order"][value="desc"]').checked = true;
 
-        currentFilters = { itemName: '', priceMin: null, priceMax: null };
+        currentFilters = { itemName: '', priceMin: null, priceMax: null, collectedStatus: 'all' };
         currentSort = { by: 'updateTimeUTC', order: 'desc' };
+
+        // 重設後也應儲存狀態
+        localStorage.setItem('currentFilters', JSON.stringify(currentFilters));
+        localStorage.setItem('currentSort', JSON.stringify(currentSort));
 
         processAndRender();
         toggleFilterSortPopover();
+    }
+
+    /**
+     * 根據儲存的狀態，初始化篩選/排序表單的UI
+     */
+    function updateFilterSortUI() {
+        itemNameFilterInput.value = currentFilters.itemName;
+        priceMinFilterInput.value = currentFilters.priceMin;
+        priceMaxFilterInput.value = currentFilters.priceMax;
+        collectedStatusFilterSelect.value = currentFilters.collectedStatus || 'all';
+        sortBySelect.value = currentSort.by;
+        document.querySelector(`input[name="sort-order"][value="${currentSort.order}"]`).checked = true;
     }
 
     /**
@@ -299,6 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetFiltersSortButton.addEventListener('click', resetFilterSort);
 
     // --- 程式進入點 ---
+    updateFilterSortUI(); // 頁面載入時，根據 localStorage 初始化篩選器 UI
     // 初始載入資料，並設定定時器。
     fetchAndDisplayItems();
     setupMqttClient(); // 啟動 MQTT 客戶端
