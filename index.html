@@ -21,20 +21,22 @@
         <div id="error-message" class="hidden">
             <p>Data fetch error. Please try again later.</p>
         </div>
-        <table id="item-table" class="hidden">
-            <thead>
-                <tr>
-                    <th class="image-cell">Image</th>
-                    <th>Item name</th>
-                    <th>Price</th>
-                    <th>Last update</th>
-                    <th>Collected</th>
-                </tr>
-            </thead>
-            <tbody id="item-table-body">
-                <!-- JavaScript 會在這裡動態插入資料 -->
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table id="item-table" class="hidden">
+                <thead>
+                    <tr>
+                        <th>Check</th>
+                        <th class="image-cell">Img</th>
+                        <th>Item name</th>
+                        <th>Price</th>
+                        <th>Last update</th>
+                    </tr>
+                </thead>
+                <tbody id="item-table-body">
+                    <!-- JavaScript 會在這裡動態插入資料 -->
+                </tbody>
+            </table>
+        </div>
 
         <!-- Floating Window (Popover) for Filter/Sort -->
         <div id="filter-sort-popover" class="popover hidden">

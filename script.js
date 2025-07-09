@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ownedCheckbox.addEventListener('change', handleOwnedCheckboxChange); // 綁定事件
             ownedCell.appendChild(ownedCheckbox);
 
-            row.append(imgCell, nameCell, priceCell, timeCell, ownedCell);
+            row.append(ownedCell, imgCell, nameCell, priceCell, timeCell);
             fragment.appendChild(row);
         });
 

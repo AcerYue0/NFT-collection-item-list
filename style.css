@@ -26,7 +26,6 @@ h1 {
 #item-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
 #item-table th, #item-table td {
@@ -216,6 +215,37 @@ h1 {
 }
 
 .image-cell {
-    width: 50px; 
+    width: 30px; 
     text-align: center;
+    }
+
+/* 增加一個容器來處理表格在小螢幕上的水平滾動 */
+.table-wrapper {
+    overflow-x: auto; /* 關鍵：當內容超出寬度時，顯示水平滾動條 */
+    -webkit-overflow-scrolling: touch; /* 為了在 iOS 上有更平滑的滾動體驗 */
+    margin-top: 20px; /* 將原本表格的上邊距移到這裡 */
+}
+
+
+/* --- 響應式設計 (Responsive Design) --- */
+/* 當螢幕寬度小於或等於 768px (常見的平板或手機橫向寬度) 時，套用以下樣式 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* 減少頁面邊距，爭取更多內容空間 */
+    }
+
+    .container {
+        padding: 15px; /* 減少容器內邊距 */
+    }
+
+    h1 {
+        font-size: 1.6em; /* 縮小主標題字體 */
+    }
+
+    /* 讓彈出視窗在手機上更合適 */
+    .popover {
+        width: 90%;
+        left: 5%;
+        transform: none; /* 取消原本的水平置中，直接用 left 定位 */
+    }
 }
