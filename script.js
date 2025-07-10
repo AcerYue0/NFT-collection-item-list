@@ -128,7 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. 圖片欄
             const imgCell = document.createElement('td');
             imgCell.className = 'image-cell';
-            imgCell.innerHTML = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
+            const encodedItemName = item.itemName.replace(/ /g, '+');
+            const linkUrl = `https://msu.io/marketplace/nft?keyword=${encodedItemName}&price=0%2C10000000000&level=0%2C250&categories=0&potential=0%2C4&bonusPotential=0%2C4&starforce=0%2C25&options=`;
+            const imageContent = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
+            // 增加超連結，並在新分頁開啟
+            imgCell.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${imageContent}</a>`;
 
             // 2. 名稱欄
             const nameCell = document.createElement('td');
