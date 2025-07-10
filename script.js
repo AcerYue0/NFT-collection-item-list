@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 儲存當前的排序條件 (預設按更新時間降序)
     let currentSort = localStorage.getItem('currentSort') ? JSON.parse(localStorage.getItem('currentSort')) :
     {
-        by: 'updateTimeUTC',
-        order: 'desc'
+        by: 'price',
+        order: 'asc'
     };
 
     // --- DOM 元素選取 ---
