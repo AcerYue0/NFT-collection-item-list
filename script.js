@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const imgCell = document.createElement('td');
             imgCell.className = 'image-cell';
             const encodedItemName = item.itemName.replace(/ /g, '+');
-            const linkUrl = `https://msu.io/marketplace/nft?keyword=${encodedItemName}&price=0%2C10000000000&level=0%2C250&categories=0&potential=0%2C4&bonusPotential=0%2C4&starforce=0%2C25&options=`;
+            const linkUrl = `https://msu.io/marketplace/nft?keyword=${encodedItemName}&price=0%2C10000000000&level=0%2C250&categories=0&potential=0%2C4&bonusPotential=0%2C4&starforce=0%2C25&sort=ExploreSorting_LOWEST_PRICE`;
             const imageContent = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
             // 增加超連結，並在新分頁開啟
             imgCell.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${imageContent}</a>`;
