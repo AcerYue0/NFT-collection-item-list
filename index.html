@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFT collection price list</title>
+    <title>NFT collection floor price list</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div class="container">
-        <h1>NFT collection price list</h1>
-        <div class="status-bar">
+        <h1>NFT collection floor price list</h1>
+        <div class="info-bar">
+            <small id="version-text">ver. 1.0.071002</small>
             <small id="last-updated-text"></small>
         </div>
-        
+
         <div id="loading-indicator">
             <p>Fetching data from server...</p>
         </div>
-        <span class="control-icon" id="filter-sort-toggle">Filter & Sort⚙️</span>
         <div id="error-message" class="hidden">
             <p>Data fetch error. Please try again later.</p>
         </div>
+
+        <span class="control-icon" id="filter-sort-toggle">Filter & Sort⚙️</span>
         <div class="table-wrapper">
             <table id="item-table" class="hidden">
                 <thead>
@@ -90,4 +94,5 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
