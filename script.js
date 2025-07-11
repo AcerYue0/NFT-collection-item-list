@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
-    const API_URL = 'https://maplestory-n.com/api/Marketplace/getList';
+    const API_URL = 'https://marketplace-core-ll9s.onrender.com/api/Marketplace/getList';
     const UPDATE_INTERVAL_MS = 1 * 60 * 1000; // 30 分鐘
 
     // MQTT 設定 (請根據您的環境修改)
