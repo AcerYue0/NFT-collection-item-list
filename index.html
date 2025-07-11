@@ -13,9 +13,12 @@
     <div class="container">
         <h1>NFT collection floor price list</h1>
         <div class="info-bar">
-            <small id="version-text">ver. 1.0.2528.05</small>
+            <small id="version-text">ver. 1.1.2528.01</small>
             <small id="last-updated-text"></small>
         </div>
+
+        <span class="control-icon" id="filter-sort-toggle">Filter & Sort ⚙️</span>
+        <span class="control-icon" id="donate">Donate Author ❤️</span>
 
         <div id="loading-indicator">
             <p>Fetching data from server...</p>
@@ -24,7 +27,6 @@
             <p>Data fetch error. Please try again later.</p>
         </div>
 
-        <span class="control-icon" id="filter-sort-toggle">Filter & Sort⚙️</span>
         <div class="table-wrapper">
             <table id="item-table" class="hidden">
                 <thead>
@@ -90,7 +92,25 @@
                 <button id="reset-filters-sort">Reset</button>
             </div>
         </div>
+
+        <!-- Floating Window (Popover) for Donation -->
+        <div id="donate-popover" class="popover hidden">
+            <div class="popover-header">
+                <h3>Donate to Author</h3>
+                <button id="close-donate-popover" class="close-button">&times;</button>
+            </div>
+            <div class="popover-content">
+                <div class="filter-group">
+                    <label for="donate-amount">Amount (Neso):</label>
+                    <input type="number" id="donate-amount" placeholder="Enter amount" min="1">
+                </div>
+                <button id="confirm-donation">Confirm Donation</button>
+            </div>
+        </div>
     </div>
+
+    <!-- Overlay for Popovers -->
+    <div id="popover-overlay" class="hidden"></div>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="script.js"></script>
 </body>

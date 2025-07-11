@@ -3,14 +3,14 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
-    const API_URL = 'https://marketplace-core-ll9s.onrender.com/api/marketplace/getList';
+    const API_URL = 'https://maplestory-n.com/api/Marketplace/getList';
     const UPDATE_INTERVAL_MS = 1 * 60 * 1000; // 30 分鐘
 
     // MQTT 設定 (請根據您的環境修改)
     const MQTT_BROKER_URL = 'ws://127.0.0.1:9001'; // 使用 WebSocket (ws:// 或 wss://)
     const MQTT_TOPIC = 'marketplace/item/update';
 
-
+    let DONATE_URL = 'https://maplestory-n.com/?toAddress=0xcece13060EC558d1F3c39945a7283FAA1B002777&amount={}';
     // --- 全域狀態 ---
     // 儲存從 API 獲取的原始資料陣列，這是唯一的資料來源 (Single Source of Truth)
     let allApiData = [];
@@ -54,6 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyFiltersSortButton = document.getElementById('apply-filters-sort');
     const resetFiltersSortButton = document.getElementById('reset-filters-sort');
 
+    // Donate Popover Elements
+    const donateButton = document.getElementById('donate');
+    const donatePopover = document.getElementById('donate-popover');
+    const closeDonatePopoverButton = document.getElementById('close-donate-popover');
+    const donateAmountInput = document.getElementById('donate-amount');
+    const confirmDonationButton = document.getElementById('confirm-donation');
+
+    // Overlay Element
+    const popoverOverlay = document.getElementById('popover-overlay');
+
     // --- 函式定義 ---
     // 將所有功能性函式定義在這裡。因為它們都在 DOMContentLoaded 內部，
     // 所以它們可以存取上面定義的所有變數。
@@ -70,11 +80,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
+     * 關閉所有彈出視窗和遮罩
+     */
+    function closeAllPopovers() {
+        filterSortPopover.classList.add('hidden');
+        donatePopover.classList.add('hidden');
+        popoverOverlay.classList.add('hidden');
+    }
+
+    /**
      * 切換篩選/排序彈出視窗的顯示狀態
      */
     function toggleFilterSortPopover() {
-        filterSortPopover.classList.toggle('hidden');
-        if (!filterSortPopover.classList.contains('hidden')) {
+        const isHidden = filterSortPopover.classList.contains('hidden');
+        closeAllPopovers(); // 統一先關閉所有視窗
+        if (isHidden) { // 如果原本是關的，就把它跟遮罩打開
+            filterSortPopover.classList.remove('hidden');
+            popoverOverlay.classList.remove('hidden');
             itemNameFilterInput.focus();
         }
     }
@@ -373,6 +395,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * 切換捐贈彈出視窗的顯示狀態
+     */
+    function toggleDonatePopover() {
+        const isHidden = donatePopover.classList.contains('hidden');
+        closeAllPopovers(); // 統一先關閉所有視窗
+        if (isHidden) { // 如果原本是關的，就把它跟遮罩打開
+            donatePopover.classList.remove('hidden');
+            popoverOverlay.classList.remove('hidden');
+            donateAmountInput.value = ''; // 清除之前的輸入
+            donateAmountInput.focus();
+        }
+    }
+
+    /**
+     * 處理捐贈確認
+     */
+    function handleDonation() {
+        const amount = donateAmountInput.value;
+        // 驗證輸入金額是否為正數
+        if (!amount || parseFloat(amount) <= 0) {
+            alert('請輸入有效的金額。');
+            return;
+        }
+
+        const finalUrl = DONATE_URL.replace('{}', amount);
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
+        toggleDonatePopover(); // 開啟連結後關閉彈出視窗
+    }
+
+    /**
      * 設定並啟動 MQTT 客戶端
      */
     function setupMqttClient() {
@@ -404,6 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
     closePopoverButton.addEventListener('click', toggleFilterSortPopover);
     applyFiltersSortButton.addEventListener('click', handleFilterSort);
     resetFiltersSortButton.addEventListener('click', resetFilterSort);
+    donateButton.addEventListener('click', toggleDonatePopover);
+    closeDonatePopoverButton.addEventListener('click', toggleDonatePopover);
+    confirmDonationButton.addEventListener('click', handleDonation);
+    popoverOverlay.addEventListener('click', closeAllPopovers);
 
     // --- 程式進入點 ---
     updateFilterSortUI(); // 頁面載入時，根據 localStorage 初始化篩選器 UI
