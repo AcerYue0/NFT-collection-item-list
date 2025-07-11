@@ -68,16 +68,15 @@ h1 {
 .control-icon {
     background-color: #3498db;
     border-radius: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     font-weight: bold;
     cursor: pointer;
-    margin-left: 20px;
-    margin-bottom: 30px;
     color: #ffffff;
     transition: transform 0.2s ease-in-out;
     flex: 1;
     padding: 0.75em 1em;
     font-size: clamp(0.8rem, 2.5vw, 1rem);
-    border-radius: 8px;
     text-align: center;
     white-space: nowrap;
     font-family: inherit; 
@@ -85,23 +84,26 @@ h1 {
 
 .control-icon:hover {
     transform: scale(1.1);
-    background-color: #e9e9e9;
+}
+
+#donate-amount {
+    width: calc(100% - 10px);
 }
 
 /* Popover Styles */
 .popover {
-    position: absolute; /* Will be positioned relative to the container or body */
+    position: fixed; /* Will be positioned relative to the container or body */
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    z-index: 1001;
     width: 300px;
     padding: 15px;
     box-sizing: border-box;
-    top: 100px; /* Placeholder, will adjust with JS */
+    top: 50px; /* Placeholder, will adjust with JS */
     left: 50%; /* Placeholder, will adjust with JS */
-    transform: translateX(-50%); /* Center horizontally */
+    transform: translateX(-50%, -50%); /* Center horizontally */
 }
 
 .popover.hidden {
@@ -250,6 +252,7 @@ h1 {
 /* 控制按鈕的新容器 */
 .controls-container {
     display: flex;
+    align-items: center;
     gap: 1rem; /* 按鈕之間的間距 */
     margin: 1rem 0; /* 容器的上下邊距 */
 }
