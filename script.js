@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let previousDataSnapshot = {};
     // 儲存使用者標記為已持有的物品 (使用 Set 結構以獲得高效的查找性能)
     let ownedItems = new Set(JSON.parse(localStorage.getItem('ownedItems') || '[]'));
+    // 新增：儲存要排除的套裝物品列表
+    let setItemList = new Set();
 
     // 儲存當前的篩選條件
     let currentFilters = localStorage.getItem('currentFilters') ? JSON.parse(localStorage.getItem('currentFilters')) :
@@ -25,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         itemName: '',
         priceMin: null,
         priceMax: null,
-        collectedStatus: 'all' // 'all', 'collected', 'uncollected'
+        collectedStatus: 'all', // 'all', 'collected', 'uncollected'
+        excludeSetItems: false // 新增：是否排除套裝物品的狀態
     };
     // 儲存當前的排序條件 (預設按更新時間降序)
     let currentSort = localStorage.getItem('currentSort') ? JSON.parse(localStorage.getItem('currentSort')) :
@@ -51,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceMaxFilterInput = document.getElementById('price-max-filter');
     const sortBySelect = document.getElementById('sort-by');
     const collectedStatusFilterSelect = document.getElementById('collected-status-filter');
+    // 新增：選取排除套裝的 checkbox
+    const excludeSetItemsCheckbox = document.getElementById('exclude-set-items');
     const applyFiltersSortButton = document.getElementById('apply-filters-sort');
     const resetFiltersSortButton = document.getElementById('reset-filters-sort');
 
@@ -68,6 +73,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 將所有功能性函式定義在這裡。因為它們都在 DOMContentLoaded 內部，
     // 所以它們可以存取上面定義的所有變數。
 
+    /**
+     * 新增：抓取靜態資料，例如要排除的物品列表
+     */
+    async function fetchStaticData() {
+        try {
+            const response = await fetch('set_item_list.json');
+            if (!response.ok) {
+                throw new Error(`Could not fetch set_item_list.json, status: ${response.status}`);
+            }
+            const itemList = await response.json();
+            setItemList = new Set(itemList); // 將列表存為 Set 以提高查找效率
+            console.log(`${setItemList.size} items loaded into the exclusion list.`);
+        } catch (error) {
+            console.error('Error fetching static data (exclusion list):', error);
+            // 即使列表載入失敗，應用程式仍可繼續運行
+        }
+    }
     // 定義統一的時間格式選項，強制使用 24 小時制
     const dateTimeFormatOptions = {
         year: 'numeric',
@@ -209,7 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 collectedStatusMatch = !isOwned;
             }
 
-            return nameMatch && minPriceMatch && maxPriceMatch && collectedStatusMatch;
+            // 新增：排除套裝物品的篩選邏輯
+            // 如果 "excludeSetItems" 為 true，則過濾掉在 setItemList 中的物品
+            const excludeSetItemsMatch = !currentFilters.excludeSetItems || !setItemList.has(item.itemName);
+
+            return nameMatch && minPriceMatch && maxPriceMatch && collectedStatusMatch && excludeSetItemsMatch;
         });
 
         itemsToDisplay.sort((a, b) => {
@@ -263,6 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentFilters.priceMin = priceMinFilterInput.value ? parseFloat(priceMinFilterInput.value) : null;
         currentFilters.priceMax = priceMaxFilterInput.value ? parseFloat(priceMaxFilterInput.value) : null;
         currentFilters.collectedStatus = collectedStatusFilterSelect.value;
+        // 新增：讀取排除套裝 checkbox 的狀態
+        currentFilters.excludeSetItems = excludeSetItemsCheckbox.checked;
 
         currentSort.by = sortBySelect.value;
         currentSort.order = document.querySelector('input[name="sort-order"]:checked').value;
@@ -282,9 +310,11 @@ document.addEventListener('DOMContentLoaded', () => {
         priceMaxFilterInput.value = '';
         sortBySelect.value = 'updateTimeUTC';
         collectedStatusFilterSelect.value = 'all';
+        // 新增：重設排除套裝 checkbox
+        excludeSetItemsCheckbox.checked = false;
         document.querySelector('input[name="sort-order"][value="desc"]').checked = true;
 
-        currentFilters = { itemName: '', priceMin: null, priceMax: null, collectedStatus: 'all' };
+        currentFilters = { itemName: '', priceMin: null, priceMax: null, collectedStatus: 'all', excludeSetItems: false };
         currentSort = { by: 'updateTimeUTC', order: 'desc' };
 
         // 重設後也應儲存狀態
@@ -303,6 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
         priceMinFilterInput.value = currentFilters.priceMin;
         priceMaxFilterInput.value = currentFilters.priceMax;
         collectedStatusFilterSelect.value = currentFilters.collectedStatus || 'all';
+        // 新增：根據儲存的狀態更新 checkbox
+        excludeSetItemsCheckbox.checked = currentFilters.excludeSetItems || false;
         sortBySelect.value = currentSort.by;
         document.querySelector(`input[name="sort-order"][value="${currentSort.order}"]`).checked = true;
     }
@@ -461,11 +493,19 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmDonationButton.addEventListener('click', handleDonation);
     popoverOverlay.addEventListener('click', closeAllPopovers);
 
+    /**
+     * 新增：應用程式初始化函式
+     * 確保靜態資料先載入，再執行後續操作
+     */
+    async function initializeApp() {
+        updateFilterSortUI(); // 根據 localStorage 初始化 UI
+        await fetchStaticData(); // 首先載入靜態的排除列表
+        await fetchAndDisplayItems(); // 然後載入主要的物品資料
+        setupMqttClient(); // 啟動 MQTT 客戶端
+        setInterval(fetchAndDisplayItems, UPDATE_INTERVAL_MS); // 設定定時更新
+    }
+
     // --- 程式進入點 ---
-    updateFilterSortUI(); // 頁面載入時，根據 localStorage 初始化篩選器 UI
-    // 初始載入資料，並設定定時器。
-    fetchAndDisplayItems();
-    setupMqttClient(); // 啟動 MQTT 客戶端
-    setInterval(fetchAndDisplayItems, UPDATE_INTERVAL_MS);
+    initializeApp(); // 執行應用程式初始化
 
 }); // DOMContentLoaded 事件監聽器結束

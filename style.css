@@ -92,18 +92,18 @@ h1 {
 
 /* Popover Styles */
 .popover {
-    position: fixed; /* Will be positioned relative to the container or body */
+    position: fixed;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    z-index: 1001;
+    z-index: 1000;
     width: 300px;
     padding: 15px;
     box-sizing: border-box;
     top: 50px; /* Placeholder, will adjust with JS */
     left: 50%; /* Placeholder, will adjust with JS */
-    transform: translateX(-50%, -50%); /* Center horizontally */
+    transform: translateX(-50%); /* Center horizontally */
 }
 
 .popover.hidden {
@@ -138,17 +138,20 @@ h1 {
 }
 
 .popover-content h4 {
-    margin-top: 15px;
+    margin-top: 10px;
     margin-bottom: 10px;
+    font-size: 1.1em;
     color: #555;
 }
 
 .filter-group, .sort-group, .filter-group {
-    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .filter-group label, .sort-group label, .filter-group label {
     display: block;
+    margin-top: 5px;
     margin-bottom: 5px;
     font-weight: bold;
 }
@@ -157,14 +160,14 @@ h1 {
 .filter-group input[type="number"],
 .sort-group select, .filter-group select {
     width: calc(100% - 10px);
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
 .filter-group input[type="number"] {
-    width: calc(50% - 15px); /* For min/max price */
+    width: calc(50% - 15px);
     display: inline-block;
 }
 .filter-group span {
@@ -173,8 +176,44 @@ h1 {
     text-align: center;
 }
 
+.filter-group-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+/* Override default styles for the label in this specific group */
+.filter-group-checkbox label {
+    display: inline;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.filter-group-checkbox input[type="checkbox"] {
+    cursor: pointer;
+}
+
 .sort-group input[type="radio"] {
     margin-right: 5px;
+}
+
+.sort-group-inline, .filter-group-inline {
+    display: flex;
+    align-items: center;
+    height: auto;
+}
+
+.sort-group.sort-group-inline > label {
+    width: auto;
+    align-items: center;
+}
+
+.sort-group.sort-group-inline > label[for] {
+    font-weight: normal;
+    align-items: center;
+    margin-left: 5px;
+    margin-right: 10px; /* Add space after the label */
 }
 
 .popover button {

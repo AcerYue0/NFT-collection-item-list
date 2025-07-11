@@ -13,7 +13,7 @@
     <div class="container">
         <h1>NFT collection floor price list</h1>
         <div class="info-bar">
-            <small id="version-text">ver. 1.1.2528.02</small>
+            <small id="version-text">ver. 1.1.2528.03</small>
             <small id="last-updated-text"></small>
         </div>
 
@@ -74,6 +74,11 @@
                     </select>
                 </div>
 
+                <div class="filter-group filter-group-inline filter-group-checkbox">
+                    <input type="checkbox" id="exclude-set-items">
+                    <label for="exclude-set-items">Exclude set items</label>
+                </div>
+
                 <h4>Sort</h4>
                 <div class="sort-group">
                     <label>Sort by:</label>
@@ -83,7 +88,7 @@
                         <option value="updateTimeUTC">update time</option>
                     </select>
                 </div>
-                <div class="sort-group">
+                <div class="sort-group sort-group-inline">
                     <label>Order:</label>
                     <input type="radio" id="sort-asc" name="sort-order" value="asc" checked>
                     <label for="sort-asc">Asc</label>
