@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 透過數值大小判斷 timestamp 是秒還是毫秒
         // 當前時間的秒級 timestamp 約為 10 位數，毫秒級為 13 位數
-        const timestampInMs = utcTimestamp > 10**11 ? utcTimestamp : utcTimestamp * 1000;
+        const timestampInMs = utcTimestamp > 10 ** 11 ? utcTimestamp : utcTimestamp * 1000;
         return new Date(timestampInMs).toLocaleString('default', dateTimeFormatOptions);
     }
 
@@ -299,7 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage.classList.add('hidden');
 
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, {
+                method: "GET",
+                credentials: "include"
+            });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const newDataObject = await response.json();
 
