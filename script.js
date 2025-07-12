@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
     const API_URL = 'https://marketplace-core-ll9s.onrender.com/api/marketplace/getList';
-    const UPDATE_INTERVAL_MS = 1 * 60 * 1000; // 30 分鐘
+    const UPDATE_INTERVAL_MS = 1 * 60 * 1000; // 1 分鐘
 
     // MQTT 設定 (請根據您的環境修改)
     const MQTT_BROKER_URL = 'ws://127.0.0.1:9001'; // 使用 WebSocket (ws:// 或 wss://)
@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let ownedItems = new Set(JSON.parse(localStorage.getItem('ownedItems') || '[]'));
     // 新增：儲存要排除的套裝物品列表
     let setItemList = new Set();
+    // 新增：儲存所有物品的 ID 映射
+    let itemIdMap = new Map();
 
     // 儲存當前的篩選條件
     let currentFilters = localStorage.getItem('currentFilters') ? JSON.parse(localStorage.getItem('currentFilters')) :
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 所以它們可以存取上面定義的所有變數。
 
     /**
-     * 新增：抓取靜態資料，例如要排除的物品列表
+     * 新增：抓取靜態資料，例如要排除的物品列表和物品ID
      */
     async function fetchStaticData() {
         try {
@@ -82,11 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(`Could not fetch set_item_list.json, status: ${response.status}`);
             }
-            const itemList = await response.json();
-            setItemList = new Set(itemList); // 將列表存為 Set 以提高查找效率
-            console.log(`${setItemList.size} items loaded into the exclusion list.`);
+            const itemData = await response.json();
+
+            // 處理 "set" 類別的物品，加入排除列表
+            const setItemNames = Object.keys(itemData.set || {});
+            setItemList = new Set(setItemNames);
+            console.log(`${setItemList.size} set items loaded into the exclusion list.`);
+
+            // 建立 itemName -> itemId 的映射
+            itemIdMap.clear(); // 清空舊的映射
+            const allItems = { ...(itemData.normal || {}), ...(itemData.set || {}) };
+            for (const [name, id] of Object.entries(allItems)) {
+                itemIdMap.set(name, id);
+            }
+            console.log(`${itemIdMap.size} total items loaded into the ID map.`);
         } catch (error) {
-            console.error('Error fetching static data (exclusion list):', error);
+            console.error('Error fetching static data (item list):', error);
             // 即使列表載入失敗，應用程式仍可繼續運行
         }
     }
@@ -174,10 +187,15 @@ document.addEventListener('DOMContentLoaded', () => {
             imgCell.className = 'image-cell';
             const encodedItemName = item.itemName.replace(/ /g, '+');
             const linkUrl = `https://msu.io/marketplace/nft?keyword=${encodedItemName}&price=0%2C10000000000&level=0%2C250&categories=0&potential=0%2C4&bonusPotential=0%2C4&starforce=0%2C25&sort=ExploreSorting_LOWEST_PRICE`;
-            const imageContent = item.imgUrl ? `<img src="${item.imgUrl}" alt="${item.itemName}" class="item-image">` : '<span class="no-image">No Image</span>';
+            
+            // --- 圖片 URL 生成邏輯修改 ---
+            let imageContent;
+            const itemId = itemIdMap.get(item.itemName); // 從 Map 中獲取 ID
+
+            const itemIconUrl = `https://api-static.msu.io/itemimages/icon/${itemId}.png`;
+            imageContent = `<img src="${itemIconUrl}" alt="${item.itemName}" class="item-image" onerror="this.style.display='none'; this.nextSibling.style.display='inline';"><span class="no-image" style="display:none;">No Image</span>`;
             // 增加超連結，並在新分頁開啟
             imgCell.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${imageContent}</a>`;
-
             // 2. 名稱欄
             const nameCell = document.createElement('td');
             nameCell.textContent = item.itemName;
